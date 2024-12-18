@@ -22,8 +22,8 @@ const Grafica = () => {
                     {
                         label: `f(x) = ${func}`,
                         data: yValues,
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: getComputedStyle(root).getPropertyValue('--purple-3').trim(),
+                        backgroundColor: getComputedStyle(root).getPropertyValue('--purple-2').trim(),
                         borderWidth: 2,
                     },
                 ],
@@ -53,9 +53,19 @@ const Grafica = () => {
     };
 
     return (
-        <div className='d-flex justify-content-center p-3 m-2 bg-dark-subtle rounded'>
-            {chartData ? <Line data={chartData} options={options} /> : <p>Introduce una función válida.</p>}
-        </div>
+        <div className='p-3 m-2 bg-dark-subtle rounded'>
+
+            <div className="text-center">
+                <h2>Grafica</h2>
+                <p>Grafica segun los datos del usuario</p>
+            </div>
+
+            <div className="card p-2" style={{ overflowX: 'auto' }}>
+                <div className="card-body d-flex justify-content-center align-items-center" style={{ minWidth: '600px', height: 'auto', minHeight: '400px' }}>
+                    {chartData ? <Line data={chartData} options={options} /> : <p>Introduce una función válida.</p>}
+                </div>
+            </div>
+        </div >
     )
 }
 

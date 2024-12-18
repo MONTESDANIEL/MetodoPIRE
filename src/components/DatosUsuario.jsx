@@ -1,47 +1,49 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const DatosUsuario = () => {
 
-    const [transmisores, setTransmisores] = useState([
-        { frecuencia: '', anchoDeBanda: '', potencia: '' },
-        { frecuencia: '', anchoDeBanda: '', potencia: '' },
-        { frecuencia: '', anchoDeBanda: '', potencia: '' }
-    ]);
+    const estado = localStorage.getItem('estado');
+
+    const [transmisores, setTransmisores] = useState(
+        estado ? JSON.parse(estado) : [
+            { frecuencia: '', anchoDeBanda: '', potencia: '' },
+            { frecuencia: '', anchoDeBanda: '', potencia: '' },
+            { frecuencia: '', anchoDeBanda: '', potencia: '' }
+        ]
+    );
+
+    // Guarda los transmisores en el localStorage cada vez que se actualiza
+    useEffect(() => {
+        localStorage.setItem('estado', JSON.stringify(transmisores));
+    }, [transmisores]); // Solo se ejecuta cuando 'transmisores' cambia
 
     const CardForm = ({ iteracion }) => {
 
         // Estado local para cada formulario (se mueve dentro del componente CardForm)
-        const [frecuencia, setFrecuencia] = useState('');
-        const [anchoDeBanda, setAnchoDeBanda] = useState('');
-        const [potencia, setPotencia] = useState('');
+        const [frecuencia, setFrecuencia] = useState(transmisores[iteracion].frecuencia);
+        const [anchoDeBanda, setAnchoDeBanda] = useState(transmisores[iteracion].anchoDeBanda);
+        const [potencia, setPotencia] = useState(transmisores[iteracion].potencia);
 
         const handlerSave = () => {
             // Actualiza el estado de los transmisores de manera correcta
             const nuevosTransmisores = [...transmisores]; // Hacemos una copia del arreglo de transmisores
 
             // Actualizamos el transmisor específico en el índice correspondiente
-            nuevosTransmisores[iteracion] = {
-                frecuencia,
-                anchoDeBanda,
-                potencia
-            };
+            nuevosTransmisores[iteracion] = { frecuencia, anchoDeBanda, potencia };
 
             // Actualizamos el estado con los nuevos valores
             setTransmisores(nuevosTransmisores);
-
-            // Verificamos los datos guardados
-            console.log("transmisores:", nuevosTransmisores);
         }
 
         return (
             <div className="col-lg-4">
-                <div className="bg-secondary m-1 p-3 rounded">
+                <div className="bg-body-tertiary m-1 p-3 rounded">
                     <h3 className="text-center"> Transmisor {iteracion + 1}</h3>
                     <hr />
                     <form> {/* Evita el envío del formulario */}
                         <h5>Frecuencia (FC)</h5>
                         <input
-                            type="text"
+                            type="number"
                             className="form-control mb-2"
                             placeholder="Ingrese el valor de la frecuencia"
                             value={frecuencia}
@@ -50,7 +52,7 @@ const DatosUsuario = () => {
 
                         <h5>Ancho de Banda (BW)</h5>
                         <input
-                            type="text"
+                            type="number"
                             className="form-control mb-2"
                             placeholder="Ingrese el valor del ancho de banda"
                             value={anchoDeBanda}
@@ -59,7 +61,7 @@ const DatosUsuario = () => {
 
                         <h5>Potencia (P)</h5>
                         <input
-                            type="text"
+                            type="number"
                             className="form-control mb-2"
                             placeholder="Ingrese el valor de la potencia"
                             value={potencia}
@@ -70,7 +72,7 @@ const DatosUsuario = () => {
                         <div className="d-flex justify-content-center mt-3">
                             <button
                                 type="button"
-                                className="btn btn-sm btn-success"
+                                className="btn btn-sm btn-purple-1"
                                 onClick={handlerSave}>
                                 <span>Guardar datos transmisor {iteracion + 1}</span>
                             </button>
