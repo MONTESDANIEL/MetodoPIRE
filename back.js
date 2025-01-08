@@ -19,10 +19,10 @@ export const calculo = (transmisores, datosPisoRuido) => {
     console.log('PIRES 1: ', resultadosPIRE[0])
 
     const señales = [
-        { center: transmisores[0].frecuencia, bandwidth: transmisores[0].anchoDeBanda, pire: resultadosPIRE[0] }, // Señal 1
-        { center: transmisores[1].frecuencia, bandwidth: transmisores[1].anchoDeBanda, pire: resultadosPIRE[1] }, // Señal 2
-        { center: transmisores[2].frecuencia, bandwidth: transmisores[2].anchoDeBanda, pire: resultadosPIRE[2] }, // Señal 3
+        { center: parseInt(transmisores[0].frecuencia), bandwidth: parseInt(transmisores[0].anchoDeBanda), pire: resultadosPIRE[0] }, // Señal 1
+        { center: parseInt(transmisores[1].frecuencia), bandwidth: parseInt(transmisores[1].anchoDeBanda), pire: resultadosPIRE[1] }, // Señal 2
+        { center: parseInt(transmisores[2].frecuencia), bandwidth: parseInt(transmisores[2].anchoDeBanda), pire: resultadosPIRE[2] }, // Señal 3
     ]
 
-    GraficaEspectral(señales, pisoRuidodBm)
+    return {señales, pisoRuidodBm}
 }

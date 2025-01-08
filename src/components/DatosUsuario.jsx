@@ -109,7 +109,10 @@ const DatosUsuario = () => {
         const handlerSave = () => {
             setPisoRuido({temperatura, anchoDeBandaGeneral, perdida, gananciaAmplificador, gananciaAntena});
             // Calculo viene importado de la clase back
-            calculo(transmisores, {temperatura, anchoDeBandaGeneral, perdida, gananciaAmplificador, gananciaAntena})
+            const {señales, pisoRuidodBm} = calculo(transmisores, {temperatura, anchoDeBandaGeneral, perdida, gananciaAmplificador, gananciaAntena})
+            console.log('Señales desde submit: ', señales)
+            console.log('pisoRuidodBm desde submit: ', pisoRuidodBm)
+
         }
     
         return (

@@ -6,7 +6,7 @@ import { Line } from 'react-chartjs-2';
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 export const GraficaEspectral = (señales, pisoRuido) => {
-    const [chartData, setChartData] = useState(null);
+    const [chartData, setChartData] = useState(generateSpectralData());
 
     // Función para generar datos espectrales de las señales
     function generateSpectralData() {
@@ -59,9 +59,9 @@ export const GraficaEspectral = (señales, pisoRuido) => {
     }
 
     // useEffect para actualizar los datos de la gráfica cuando cambien las señales o el piso de ruido
-    useEffect(() => {
-        setChartData(generateSpectralData());
-    }, [señales, pisoRuido]); // Dependencias: señales y pisoRuido
+    // useEffect(() => {
+    //     setChartData(generateSpectralData());
+    // }, [señales, pisoRuido]); // Dependencias: señales y pisoRuido
 
     const options = {
         responsive: true,
