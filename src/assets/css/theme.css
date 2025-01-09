@@ -1,0 +1,68 @@
+:root {
+    --purple-1: #e7cdf2;
+    --purple-2: #daaeed;
+    --purple-3: #d6a2ed;
+}
+
+.bg-purple-1 {
+    background-color: var(--purple-1);
+}
+
+.bg-purple-2 {
+    background-color: var(--purple-2);
+}
+
+.bg-purple-3 {
+    background-color: var(--purple-3);
+}
+
+/* Botón con color de fondo morado 1 */
+.btn-purple-1 {
+    background-color: var(--purple-1);
+    color: black;
+    border: 1px solid var(--purple-1);
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.btn-purple-1:hover {
+    background-color: var(--purple-2);
+    border-color: var(--purple-2);
+    cursor: pointer;
+}
+
+/* Botón con color de fondo morado 2 */
+.btn-purple-2 {
+    background-color: var(--purple-2);
+    color: black;
+    border: 1px solid var(--purple-2);
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.btn-purple-2:hover {
+    background-color: var(--purple-3);
+    border-color: var(--purple-3);
+    cursor: pointer;
+}
+
+/* Botón con color de fondo morado 3 */
+.btn-purple-3 {
+    background-color: var(--purple-3);
+    color: black;
+    border: 1px solid var(--purple-3);
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.btn-purple-3:hover {
+    background-color: var(--purple-1);
+    border-color: var(--purple-1);
+    cursor: pointer;
+}
