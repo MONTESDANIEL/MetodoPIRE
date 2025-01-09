@@ -1,10 +1,14 @@
 import { useState, useEffect } from "react";
 import { calculo } from "../../back";
+import Grafica from "../components/Grafica";
 
 const DatosUsuario = () => {
 
     const estado = localStorage.getItem('estado');
     const estadopisoRuido = localStorage.getItem('estadopisoRuido')
+
+    const [señales, setSeñales] = useState();
+    const [pisoRuidodBm, setPisoRuidodBm] = useState();
 
     const [transmisores, setTransmisores] = useState(
         estado ? JSON.parse(estado) : [
@@ -16,7 +20,7 @@ const DatosUsuario = () => {
 
     const [pisoRuido, setPisoRuido] = useState(
         estadopisoRuido ? JSON.parse(estadopisoRuido) :
-        {temperatura: '', anchoDeBandaGeneral: '', perdida: '', gananciaAmplificador: '', gananciaAntena: ''}
+            { temperatura: '', anchoDeBandaGeneral: '', perdida: '', gananciaAmplificador: '', gananciaAntena: '' }
     )
 
     // Guarda los transmisores en el localStorage cada vez que se actualiza
@@ -107,20 +111,22 @@ const DatosUsuario = () => {
         const [gananciaAmplificador, setGananciaAmplificador] = useState(pisoRuido.gananciaAmplificador);
 
         const handlerSave = () => {
-            setPisoRuido({temperatura, anchoDeBandaGeneral, perdida, gananciaAmplificador, gananciaAntena});
-            // Calculo viene importado de la clase back
-            const {señales, pisoRuidodBm} = calculo(transmisores, {temperatura, anchoDeBandaGeneral, perdida, gananciaAmplificador, gananciaAntena})
-            console.log('Señales desde submit: ', señales)
-            console.log('pisoRuidodBm desde submit: ', pisoRuidodBm)
+            setPisoRuido({ temperatura, anchoDeBandaGeneral, perdida, gananciaAmplificador, gananciaAntena });
 
+            // Calcula las señales y el piso de ruido dBm con los datos actuales
+            const {señales, pisoRuidodBm} = calculo(transmisores, {temperatura, anchoDeBandaGeneral, perdida, gananciaAmplificador, gananciaAntena})
+
+            // Si necesitas actualizar estados adicionales, puedes hacerlo aquí
+            setSeñales(señales);
+            setPisoRuidodBm(pisoRuidodBm);
         }
-    
+
         return (
             <div className="w-100 ">
                 <div className="bg-body-tertiary m-1 p-3 rounded ">
                     <h3 className="text-center">Datos adicionales</h3>
                     <hr />
-                    <form>{}
+                    <form>{ }
                         <h5>Perdida de transmisión (dB):</h5>
                         <input
                             type="number"
@@ -192,6 +198,10 @@ const DatosUsuario = () => {
             </div>
             <div className="mt-3">
                 <FloorSound />
+                <Grafica
+                    señales={señales}
+                    pisoRuido={pisoRuidodBm}
+                />
             </div>
         </div>
     );

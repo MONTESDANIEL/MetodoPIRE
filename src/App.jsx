@@ -1,6 +1,5 @@
 import React from 'react';
 import DatosUsuario from './components/DatosUsuario';
-import Grafica from './components/Grafica';
 
 const App = () => {
 
@@ -14,8 +13,6 @@ const App = () => {
       <main className="container-fluid p-2">
 
         <DatosUsuario></DatosUsuario>
-
-        <Grafica></Grafica>
 
       </main>
 
