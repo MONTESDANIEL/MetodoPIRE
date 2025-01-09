@@ -5,7 +5,7 @@ import { Line } from 'react-chartjs-2';
 // Registrar los componentes necesarios para Chart.js
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-export const Grafica = ({señales, pisoRuido}) => {
+export const Grafica = ({ señales, pisoRuido }) => {
     const [chartData, setChartData] = useState(generateSpectralData());
 
     // Función para generar datos espectrales de las señales
@@ -14,9 +14,23 @@ export const Grafica = ({señales, pisoRuido}) => {
         const signals = Array.isArray(señales) ? señales : [];
         const noiseFloor = pisoRuido ? pisoRuido : 0; // Piso de ruido común
         const resolution = 0.5; // Resolución en el eje x
+        const marginPercentage = 0.1; // Márgen adicional como porcentaje del ancho total del rango
 
-        // Generar valores de x
-        const xValues = Array.from({ length: 201 }, (_, i) => (i - 100) * resolution);
+        // Determinar el rango dinámico basado en las señales
+        const minFrequency = Math.min(...signals.map(s => s.center - s.bandwidth / 2));
+        const maxFrequency = Math.max(...signals.map(s => s.center + s.bandwidth / 2));
+        const rangeWidth = maxFrequency - minFrequency;
+
+        // Añadir márgenes al rango
+        const margin = rangeWidth * marginPercentage;
+        const adjustedMin = Math.floor((minFrequency - margin) / resolution) * resolution;
+        const adjustedMax = Math.ceil((maxFrequency + margin) / resolution) * resolution;
+
+        // Generar valores de x dentro del rango dinámico con márgenes
+        const xValues = Array.from(
+            { length: Math.ceil((adjustedMax - adjustedMin) / resolution) + 1 },
+            (_, i) => adjustedMin + i * resolution
+        );
 
         // Generar valores de y para cada señal
         const yValues = xValues.map(x => {
@@ -36,20 +50,28 @@ export const Grafica = ({señales, pisoRuido}) => {
             return value;
         });
 
+        // Filtrar solo valores positivos de x y sus correspondientes valores de y
+        const positiveIndices = xValues.reduce((indices, x, i) => {
+            if (x >= 0) indices.push(i);
+            return indices;
+        }, []);
+        const filteredXValues = positiveIndices.map(i => xValues[i]);
+        const filteredYValues = positiveIndices.map(i => yValues[i]);
+
         // Retornar datos formateados para Chart.js
         return {
-            labels: xValues,
+            labels: filteredXValues,
             datasets: [
                 {
                     label: 'Análisis Espectral',
-                    data: yValues,
+                    data: filteredYValues,
                     borderColor: '#4A90E2',
                     backgroundColor: 'rgba(74, 144, 226, 0.2)',
                     borderWidth: 2,
                 },
                 {
                     label: 'Piso de Ruido',
-                    data: Array(xValues.length).fill(noiseFloor),
+                    data: Array(filteredXValues.length).fill(noiseFloor),
                     borderColor: '#D9534F',
                     borderDash: [5, 5],
                     borderWidth: 2,
@@ -60,12 +82,9 @@ export const Grafica = ({señales, pisoRuido}) => {
 
     // useEffect para actualizar los datos de la gráfica cuando cambien las señales o el piso de ruido
     useEffect(() => {
-        const data = generateSpectralData();
-        if (data) {
-            setChartData(data);
-
-        }
-    }); // Dependencias: señales y pisoRuido
+        const data = generateSpectralData(señales, pisoRuido);
+        setChartData(data);
+    }, [señales, pisoRuido]); // Actualizar solo cuando cambien las señales o el piso de ruido
 
     const options = {
         responsive: true,
@@ -73,7 +92,7 @@ export const Grafica = ({señales, pisoRuido}) => {
             x: {
                 title: {
                     display: true,
-                    text: 'Frecuencia (Hz)',
+                    text: 'Frecuencia (MHz)',
                 },
             },
             y: {
