@@ -10,75 +10,69 @@ export const Grafica = ({ señales, pisoRuido }) => {
 
     // Función para generar datos espectrales de las señales
     function generateSpectralData() {
-
         const signals = Array.isArray(señales) ? señales : [];
         const noiseFloor = pisoRuido ? pisoRuido : 0; // Piso de ruido común
         const resolution = 0.5; // Resolución en el eje x
-        const marginPercentage = 0.1; // Márgen adicional como porcentaje del ancho total del rango
-
+        const marginPercentage = 0.2; // Márgen adicional como porcentaje del ancho total del rango
+    
         // Determinar el rango dinámico basado en las señales
         const minFrequency = Math.min(...signals.map(s => s.center - s.bandwidth / 2));
         const maxFrequency = Math.max(...signals.map(s => s.center + s.bandwidth / 2));
         const rangeWidth = maxFrequency - minFrequency;
-
-        // Añadir márgenes al rango
+    
+        // Añadir márgenes al rango dinámico
         const margin = rangeWidth * marginPercentage;
         const adjustedMin = Math.floor((minFrequency - margin) / resolution) * resolution;
         const adjustedMax = Math.ceil((maxFrequency + margin) / resolution) * resolution;
-
+    
         // Generar valores de x dentro del rango dinámico con márgenes
         const xValues = Array.from(
             { length: Math.ceil((adjustedMax - adjustedMin) / resolution) + 1 },
             (_, i) => adjustedMin + i * resolution
         );
-
+    
         // Generar valores de y para cada señal
         const yValues = xValues.map(x => {
             let value = noiseFloor; // Piso de ruido inicial
             signals.forEach(signal => {
                 const { center, bandwidth, pire } = signal;
                 const halfBW = bandwidth / 2;
-
-                // Evaluamos la potencia en función de la curva suave
-                if (x >= center - halfBW && x <= center + halfBW) {
-                    const distance = Math.abs(x - center);
+        
+                // Evaluamos la potencia en función de una curva suave
+                const distanceFromCenter = Math.abs(x - center);
+        
+                if (distanceFromCenter <= halfBW) {
+                    // Dentro del ancho de banda
+                    const normalizedDistance = distanceFromCenter / halfBW; // 0 en el centro, 1 en los extremos
                     const signalPower =
-                        pire - 3 * (1 - Math.cos((Math.PI * distance) / bandwidth) ** 2);
+                        pire - 3 * Math.pow(normalizedDistance, 2); // Parabólica invertida
                     value = Math.max(value, signalPower);
+                } else if (distanceFromCenter <= 2 * halfBW) {
+                    // Suavizar la transición hacia el piso de ruido
+                    const normalizedDistance = (distanceFromCenter - halfBW) / halfBW; // 0 en el borde, 1 al doble del ancho de banda
+                    const signalPower =
+                        pire - 3 - 6 * Math.pow(normalizedDistance, 2); // Parabólica descendente suave
+                    const smoothingFactor = 1 / (1 + Math.exp(-10 * (normalizedDistance - 0.5))); // Función sigmoidal para suavizar
+                    value = Math.max(value, noiseFloor + (signalPower - noiseFloor) * (1 - smoothingFactor));
                 }
             });
             return value;
-        });
-
-        // Filtrar solo valores positivos de x y sus correspondientes valores de y
-        const positiveIndices = xValues.reduce((indices, x, i) => {
-            if (x >= 0) indices.push(i);
-            return indices;
-        }, []);
-        const filteredXValues = positiveIndices.map(i => xValues[i]);
-        const filteredYValues = positiveIndices.map(i => yValues[i]);
-
+        });               
+    
         // Retornar datos formateados para Chart.js
         return {
-            labels: filteredXValues,
+            labels: xValues,
             datasets: [
                 {
                     label: 'Análisis Espectral',
-                    data: filteredYValues,
+                    data: yValues,
                     borderColor: '#4A90E2',
                     backgroundColor: 'rgba(74, 144, 226, 0.2)',
                     borderWidth: 2,
                 },
-                {
-                    label: 'Piso de Ruido',
-                    data: Array(filteredXValues.length).fill(noiseFloor),
-                    borderColor: '#D9534F',
-                    borderDash: [5, 5],
-                    borderWidth: 2,
-                },
             ],
         };
-    }
+    }    
 
     // useEffect para actualizar los datos de la gráfica cuando cambien las señales o el piso de ruido
     useEffect(() => {
